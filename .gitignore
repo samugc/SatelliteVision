@@ -1,0 +1,14 @@
+.venv/
+__pycache__/
+.ipynb_checkpoints/
+.env
+.env.*
+!.env.example
+*.pth
+*.pt
+*.keras
+*.h5
+data/
+runs/
+*.egg-info/
+.DS_Store

@@ -1,0 +1,11 @@
+{
+  "source": "Master/Asignaturas/VC/Practica1/TRAINING/vit_tl_prueba2.ipynb",
+  "source_sha256": "e4926d73eb34c9198b4aa750eb4708595fe1d2a125dd8574dc2b4923005bc877",
+  "annotation_sha256": "e2f0a110afa4f20ecc81191b384f1490bb02b47fd92a4a9fb6589478e6a32eea",
+  "historical_validation_accuracy_tta": 0.832,
+  "checkpoint": "swin_best_model.pth (not located in approved sources)",
+  "predictions": "Swin per-image predictions not located",
+  "result_status": "saved notebook output; not independently reproduced",
+  "excluded_slide_claim": ".8427 lacks a traceable Swin prediction/checkpoint association",
+  "detection": "slides found; no implementation found in the two allowed roots or clearly named immediate sibling"
+}

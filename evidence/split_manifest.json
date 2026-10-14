@@ -1,0 +1,11 @@
+{
+  "seed": 42,
+  "test_size": 0.1,
+  "train": 16871,
+  "validation": 1875,
+  "input_order": "JSON image insertion order; original positional image/annotation alignment verified by ID",
+  "status": "reconstructed from available annotation file and historical code, not a saved manifest from the original run",
+  "annotations_sha256": "e2f0a110afa4f20ecc81191b384f1490bb02b47fd92a4a9fb6589478e6a32eea",
+  "train_sha256": "5150fd7fca4aa47dfdf070829f72431a2fa4420a9b2b381e3171aca3becc3f08",
+  "validation_sha256": "84cac9fccfcd317dbeeb5ea1f37e5dd85752d91979a1086f66b6158e3b0d5798"
+}
