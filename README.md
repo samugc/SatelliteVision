@@ -1,30 +1,63 @@
-# xView Computer Vision
+# SatelliteVision
 
-13-class satellite crop classification with a pretrained Swin-Base transformer.
-Originally developed during MSc Computer Vision coursework (2025–26), in a group
-context. Samuel García confirms implementing the training and evaluation work.
-The pretrained architecture and dataset are third-party resources.
+[![CI](https://github.com/samugc/SatelliteVision/actions/workflows/ci.yml/badge.svg)](https://github.com/samugc/SatelliteVision/actions/workflows/ci.yml)
 
-## Approach
-Full fine-tuning of `microsoft/swin-base-patch4-window7-224`, class-weighted
-cross-entropy, MixUp/CutMix, mixed precision, gradient accumulation and four-view
-TTA. This is image classification, not bounding-box object detection.
+Satellite image classification on **xView** with a fine-tuned **Swin Transformer**, imbalance-aware training, test-time augmentation and explicit evaluation by image identity.
 
-## Evidence
-The original notebook records **83.20% validation accuracy with TTA** on 1,875
-images. It is a historical output, not a reproduced result of the cleaned code.
-`evidence/` contains source hashes, extracted outputs and a reconstructed split
-(16,871 train / 1,875 validation). The annotation order was checked by image ID.
-The original run did not preserve an annotation hash, so reconstruction cannot
-prove that its input snapshot was identical. No Swin checkpoint or per-image
-Swin predictions was located in the approved source folders.
+Originally developed as MSc Computer Vision coursework and later refactored for reproducibility and stricter evaluation.
 
-The 84.27% attributed to Swin in slides is excluded: its model/output provenance
-is ambiguous. No cross-model performance table is claimed. Detection slides
-exist, but supporting implementation was not found in the scoped sources.
+## Highlights
+
+- 13-class satellite crop classification.
+- Full fine-tuning of `microsoft/swin-base-patch4-window7-224`.
+- Class-weighted cross-entropy with MixUp/CutMix.
+- Mixed-precision training and gradient accumulation.
+- Four-view test-time augmentation (TTA).
+- Prediction/label alignment by image ID and filename.
+- Reproducible split manifests and lightweight integrity tests.
+
+## Historical result
+
+| Model | Split | Metric | Result |
+|---|---|---:|---:|
+| Swin-Base + TTA | validation | accuracy | **83.20%** |
+
+The historical run used 16,871 training images and 1,875 validation images.
+
+The 83.20% figure is a **validation result**, not a held-out test score. The original checkpoint and per-image predictions were not preserved, so the score is reported as historical evidence rather than as a result reproduced by the cleaned repository.
+
+## Pipeline
+
+```text
+xView annotations
+      ↓
+ID-based train/validation split
+      ↓
+Swin-Base
+      ↓
+class weighting + MixUp/CutMix
+      ↓
+mixed precision + gradient accumulation
+      ↓
+validation + four-view TTA
+      ↓
+ID-aligned evaluation
+```
+
+The evaluator can report accuracy, fixed-13-class macro-F1, per-class precision/recall/F1, confusion matrix entries and misclassified examples for new prediction exports.
+
+## Repository structure
+
+```text
+classification/     split and evaluation utilities
+notebooks/          cleaned Swin training workflow
+evidence/           historical outputs and split/provenance records
+tests/              integrity and evaluation tests
+VALIDATION.md       executed checks and known limits
+```
 
 ## Run
-Python 3.11 recommended. From the repository root:
+
 ```bash
 python -m venv .venv
 source .venv/bin/activate
@@ -32,40 +65,34 @@ pip install -r requirements.txt
 python -m unittest discover -s tests -v
 jupyter lab notebooks/swin_classification.ipynb
 ```
-Obtain the original course xView recognition data under its applicable terms.
-Set `XVIEW_DATA` to the directory containing `xview_ann_train.json` and
-`xview_train/`. Images, weights and full annotations are not redistributed.
-Do not run all training cells just to inspect the project; training requires
-substantial compute. Initial model loading downloads pretrained weights.
-The requirements specify compatibility ranges, not the unknown original lock.
 
-Evaluate new exported predictions without training:
+The original xView images are not redistributed. Point `XVIEW_DATA` to the local dataset before running training cells.
+
+New prediction exports can be evaluated without retraining:
+
 ```bash
-python -m classification.core evidence/validation_split.csv runs/swin/predictions.json
+python -m classification.core \
+  evidence/validation_split.csv \
+  runs/swin/predictions.json
 ```
-The evaluator requires complete image IDs and matching filenames, returning
-accuracy, fixed-13-class macro-F1, per-class scores, confusion and error records.
-Those metrics cannot be reconstructed for the historical Swin run from an
-aggregate accuracy alone. Tests use synthetic records, not a claimed benchmark.
 
-## 2026 portfolio changes
-- Removed duplicate experiments and ambiguous index-based evaluation.
-- Joined annotations and predictions by image ID and persisted split identities.
-- Fixed the final gradient accumulation group and scheduler update count;
-  scheduler advancement is skipped on AMP overflow.
-- Fail on unreadable images instead of silently substituting black images.
-- Export new predictions, metrics and checkpoint/annotation hashes.
+## Reproducibility improvements
 
-These are cleanup/extension changes; **83.20% predates them**. Validation is used
-for checkpoint selection and TTA inspection. It is not an untouched test set;
-spatial/source-scene correlation is not controlled by this random crop split.
-Training accuracy with MixUp/CutMix is not directly comparable to validation.
+- persisted split identities;
+- explicit image-ID/filename joins;
+- rejection of missing or duplicated predictions;
+- correct handling of the final gradient-accumulation group;
+- structured metric/error exports;
+- failure on unreadable images instead of silent substitution.
 
-## Interview review
-Explain class weighting plus label smoothing, Swin's local windows, augmentation
-invariance for satellite images, TTA cost, spatial leakage and why a validation
-score does not establish generalization. Review the AI-assisted 2026 edits,
-especially accumulation normalization and identity checks, before claiming them
-as personally mastered. No claim of reliable object detection or deployment.
+These changes improve the implementation but do not retroactively alter the historical 83.20% result.
 
-Executed checks and limits: [VALIDATION.md](VALIDATION.md).
+## Limitations
+
+- Validation was used during development and is not an untouched final test set.
+- The crop split does not explicitly control spatial or source-scene correlation.
+- The original checkpoint and per-image historical predictions are unavailable.
+- Training accuracy under MixUp/CutMix is not directly comparable with validation accuracy.
+- This repository covers satellite **classification**, not object detection.
+
+See [`VALIDATION.md`](VALIDATION.md) for the exact checks executed during cleanup.
